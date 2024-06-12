@@ -1,0 +1,39 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      MONGODB_URI=mongodb+srv://madbowjam:1wsxm7eMksnNf1Gp@cluster0:yzzi21t:mongodb:net/?retryWrites=true&w=majority&appName=Cluster0:
+      DB_NAME: "Users"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npx nodemon -L src/app.mjs
+    restart: unless-stopped
+    depends_on:
+      - mongo_main
+    networks:
+      - main
+
+  mongo_main:
+    image: mongo:latest
+    command: ["mongod", "--quiet", "--logpath", "/dev/null"]
+    container_name: 'mongo_main'
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./db:/data/db
+    networks:
+      - main
+
+networks:
+  main:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local
